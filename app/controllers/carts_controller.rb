@@ -2,6 +2,7 @@
 
 class CartsController < ApplicationController
   before_action :set_cart, only: %i[show edit update destroy]
+  before_action :authorize_user!, only: :show
   rescue_from ActiveRecord::RecordNotFound, with: :invalid_cart
 
   # GET /carts
@@ -59,11 +60,16 @@ class CartsController < ApplicationController
     session[:cart_id] = nil
     respond_to do |format|
       format.html { redirect_to store_index_url, notice: 'Your cart is empty yo!' }
+      format.js
       format.json { head :no_content }
     end
   end
 
   private
+
+  def authorize_user!
+    redirect_to store_index_url unless session[:cart_id] == @cart.id
+  end
 
   def invalid_cart
     logger.error "Attempt to access invalid cart #{params[:id]}"
