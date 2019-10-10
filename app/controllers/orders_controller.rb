@@ -52,6 +52,7 @@ class OrdersController < ApplicationController
                         location: @order
         end
       else
+        ErrorMailer.error(@order).deliver_now
         format.html { render :new }
         format.json do
           render json: @order.errors,
@@ -69,6 +70,7 @@ class OrdersController < ApplicationController
         format.html { redirect_to @order, notice: 'Order was successfully updated.' }
         format.json { render :show, status: :ok, location: @order }
       else
+
         format.html { render :edit }
         format.json { render json: @order.errors, status: :unprocessable_entity }
       end
