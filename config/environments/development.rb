@@ -64,4 +64,18 @@ Rails.application.configure do
 
   # To allow development from multiple machines
   config.action_cable.disable_request_forgery_protection = true
+
+  Depot::Application.configure do
+    config.action_mailer.delivery_method = :test
+
+    config.action_mailer.smtp_settings = {
+      address: 'smtp.gmail.com',
+      port: 587,
+      domain: 'localhost',
+      authentication: 'plain',
+      user_name: 'mrigney',
+      password: 'YozuPwn57',
+      enable_starttls_auto: true
+    }
+  end
 end

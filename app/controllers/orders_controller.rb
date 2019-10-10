@@ -42,6 +42,7 @@ class OrdersController < ApplicationController
       if @order.save
         Cart.destroy(session[:cart_id])
         session[:cart_id] = nil
+        ChargeOrderJob.perform_later(@order, pay_type_params.to_h)
         format.html do
           redirect_to store_index_url, notice:
           'Thank you for your order.'
@@ -97,6 +98,14 @@ class OrdersController < ApplicationController
   end
   # ...
 
+  private
+
+  def ensure_cart_isnt_empty
+    if @cart.line_items.empty?
+      redirect_to store_index_url, notice: 'Your cart is empty'
+    end
+  end
+
   def pay_type_params
     if order_params[:pay_type] == 'Credit Card'
       params.require(:order).permit(:credit_card_number, :expiration_date)
@@ -106,12 +115,6 @@ class OrdersController < ApplicationController
       params.require(:order).permit(:po_number)
     else
       {}
-    end
-  end
-
-  def ensure_cart_isnt_empty
-    if @cart.line_items.empty?
-      redirect_to store_index_url, notice: 'Your cart is empty'
     end
   end
 end
