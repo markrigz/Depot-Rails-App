@@ -37,7 +37,7 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
 
   test 'should update user' do
     patch user_url(@user), params: { user: { name: @user.name, password: 'secret', password_confirmation: 'secret' } }
-    assert_redirected_to user_url(@user)
+    assert_redirected_to users_url
   end
 
   test 'should destroy user' do
