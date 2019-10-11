@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #---
 # Excerpted from "Agile Web Development with Rails 5.1",
 # published by The Pragmatic Bookshelf.
@@ -7,7 +9,9 @@
 # Visit http://www.pragmaticprogrammer.com/titles/rails51 for more book information.
 #---
 class CartsController < ApplicationController
-  before_action :set_cart, only: [:show, :edit, :update, :destroy]
+  before_action :set_cart, only: %i[show edit update destroy]
+  skip_before_action :authorize, only: %i[create update destroy]
+
   rescue_from ActiveRecord::RecordNotFound, with: :invalid_cart
   # GET /carts
   # GET /carts.json
@@ -17,8 +21,7 @@ class CartsController < ApplicationController
 
   # GET /carts/1
   # GET /carts/1.json
-  def show
-  end
+  def show; end
 
   # GET /carts/new
   def new
@@ -26,8 +29,7 @@ class CartsController < ApplicationController
   end
 
   # GET /carts/1/edit
-  def edit
-  end
+  def edit; end
 
   # POST /carts
   # POST /carts.json
@@ -65,26 +67,30 @@ class CartsController < ApplicationController
     @cart.destroy if @cart.id == session[:cart_id]
     session[:cart_id] = nil
     respond_to do |format|
-      format.html { redirect_to store_index_url,
-        notice: 'Your cart is currently empty' }
+      format.html do
+        redirect_to store_index_url,
+                    notice: 'Your cart is currently empty'
+      end
       format.json { head :no_content }
     end
   end
 
   # ...
   private
+
   # ...
 
-    def set_cart
-      @cart = Cart.find(params[:id])
-    end
+  def set_cart
+    @cart = Cart.find(params[:id])
+  end
 
-    # Never trust parameters from the scary internet, only allow the white list through.
-    def cart_params
-      params.fetch(:cart, {})
-    end
-    def invalid_cart
-      logger.error "Attempt to access invalid cart #{params[:id]}"
-      redirect_to store_index_url, notice: 'Invalid cart'
-    end
+  # Never trust parameters from the scary internet, only allow the white list through.
+  def cart_params
+    params.fetch(:cart, {})
+  end
+
+  def invalid_cart
+    logger.error "Attempt to access invalid cart #{params[:id]}"
+    redirect_to store_index_url, notice: 'Invalid cart'
+  end
 end

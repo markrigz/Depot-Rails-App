@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #---
 # Excerpted from "Agile Web Development with Rails 5.1",
 # published by The Pragmatic Bookshelf.
@@ -8,4 +10,13 @@
 #---
 class ApplicationController < ActionController::Base
   protect_from_forgery with: :exception
+  before_action :authorize
+
+  protected
+
+  def authorize
+    unless User.find_by(id: session[:user_id])
+      redirect_to login_url, notice: 'Please log in, pleeease, I beg ya!'
+    end
+  end
 end
